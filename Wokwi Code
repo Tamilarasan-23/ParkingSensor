@@ -1,0 +1,39 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+const int trig1 = 2;
+const int echo1 = 3;
+const int trig2 = 4;
+const int echo2 = 5;
+long readDistanceCM(int trigPin, int echoPin) {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  long duration = pulseIn(echoPin, HIGH);
+  return duration * 0.034 / 2;
+}
+void setup() {
+  pinMode(trig1, OUTPUT);
+  pinMode(echo1, INPUT);
+  pinMode(trig2, OUTPUT);
+  pinMode(echo2, INPUT);
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Parking System");
+  delay(2000);
+  lcd.clear();
+}
+void loop() {
+  long distance1 = readDistanceCM(trig1, echo1);
+  long distance2 = readDistanceCM(trig2, echo2);
+  lcd.setCursor(0, 0);
+  lcd.print("Spot1: ");
+  lcd.print(distance1 < 20 ? "Occupied" : "Free    ");
+  lcd.setCursor(0, 1);
+  lcd.print("Spot2: ");
+  lcd.print(distance2 < 20 ? "Occupied" : "Free    ");
+  delay(1000);
+}
